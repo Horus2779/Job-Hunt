@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'adzuma' => [
+        'id' => env('ADZUNA_APP_ID'),
+        'key' => env('ADZUNA_APP_KEY'),
+    ],
+
 ];
