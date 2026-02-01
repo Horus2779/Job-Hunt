@@ -11,5 +11,7 @@ class ParameterJobs extends Model
 
     protected $table = 'parameter_jobs';
 
+    protected $fillable = ['parameter', 'logic_operator'];
+
     public $timestamps = false;
 }

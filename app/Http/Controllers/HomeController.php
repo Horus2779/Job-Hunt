@@ -13,8 +13,8 @@ class HomeController extends Controller
     {}
 
 
-    public function index(AdzumaService $adzuma)
+    public function index()
     {
-        $adzuma->getJobs();
+        return view('home');
     }
 }
