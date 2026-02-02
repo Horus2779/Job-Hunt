@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ParameterJobs;
 use Illuminate\Support\Facades\Http;
 
 class AdzumaService {
@@ -17,18 +18,30 @@ class AdzumaService {
 
     public function getJobs()
     {
-        $country = 'br';
-        $query = 'developer';
+        $countries = ['br', 'ca', 'gb'];
+        $parameters = ParameterJobs::get();
 
-        $response = Http::get("https://api.adzuna.com/v1/api/jobs/{$country}/search/1", [
+        $query = $parameters->map( function ($item, $key) use ($parameters) {
+            if($key === $parameters->count() - 1) {
+                return $item->parameter;
+            }
+
+            return "$item->parameter $item->logic_operator";
+        })->implode(' ');
+
+        foreach($countries as $country) {
+            $response = Http::get("https://api.adzuna.com/v1/api/jobs/{$country}/search/1", [
                 'app_id' => $this->appId,
                 'app_key' => $this->appKey,
-                'results_per_page' => 10,
+                'results_per_page' => 50,
                 'what' => $query,
                 'content-type' => 'application/json'
-        ]);
+            ]);
 
-        dd($this->formatResults($response->json()['results']));
+            $data[$country] = $this->formatResults($response->json()['results']);
+        }
+
+        dd($data);
 
     }
 
@@ -39,7 +52,7 @@ class AdzumaService {
             'company'     => $job['company']['display_name'] ?? 'N/A',
             'location'    => $job['location']['display_name'] ?? 'Remote',
             'url'         => $job['redirect_url'],
-            'description' => str($job['description'])->limit(150),
+            'description' => str($job['description']),
             'source'      => 'Adzuna',
         ])->toArray();
     }

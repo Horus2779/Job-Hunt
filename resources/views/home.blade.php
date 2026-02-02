@@ -3,6 +3,6 @@
 
 @section('content')
 <div>
-    Teste
+    
 </div>
 @endsection

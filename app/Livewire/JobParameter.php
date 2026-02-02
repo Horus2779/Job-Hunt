@@ -31,4 +31,10 @@ class JobParameter extends Component
 
         $this->reset(['parameter', 'logic']);
     }
+
+    public function delete($id)
+    {
+        $parameter = ParameterJobs::findOrFail($id);
+        $parameter->delete();
+    }
 }

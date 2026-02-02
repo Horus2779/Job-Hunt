@@ -42,8 +42,11 @@
                         <div class="col-6">
                             <p class="m-0 p-2">{{ $parameter->parameter }}</p>
                         </div>
-                        <div class="col-6 border-start">
+                        <div class="col-4 border-start">
                             <p class="m-0 p-2">{{ $parameter->logic_operator }}</p>
+                        </div>
+                        <div class="col-2">
+                            <input type="button" value="X" class="btn btn-sm btn-outline-danger" wire:click="delete({{ $parameter->id }})" wire:confirm="Are You sure you want do delete ?">
                         </div>
                     </div>
                 @endforeach
