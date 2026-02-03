@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ParameterJobs;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class AdzumaService {
@@ -16,10 +17,20 @@ class AdzumaService {
         $this->appKey = config('services.adzuma.key');
     }
 
-    public function getJobs()
+    public function getJobs(string $country) : array
     {
-        $countries = ['br', 'ca', 'gb'];
+        $cacheKey = "jobs_adzuna_$country";
+
+        return Cache::remember($cacheKey, 10800, function () use ($country) {
+            return $this->fetchFromApi($country);
+        });
+    }
+
+    private function fetchFromApi(string $country) : array
+    {
         $parameters = ParameterJobs::get();
+
+        if ($parameters->isEmpty()) return [];
 
         $query = $parameters->map( function ($item, $key) use ($parameters) {
             if($key === $parameters->count() - 1) {
@@ -28,6 +39,8 @@ class AdzumaService {
 
             return "$item->parameter $item->logic_operator";
         })->implode(' ');
+
+        $countries = ['br', 'ca', 'gb'];
 
         foreach($countries as $country) {
             $response = Http::get("https://api.adzuna.com/v1/api/jobs/{$country}/search/1", [
@@ -38,10 +51,12 @@ class AdzumaService {
                 'content-type' => 'application/json'
             ]);
 
-            $data[$country] = $this->formatResults($response->json()['results']);
+            if($response->successful()) {
+                return $this->formatResults($response->json()['results'] ?? []);
+            }
         }
 
-        dd($data);
+        return [];
 
     }
 
@@ -56,4 +71,5 @@ class AdzumaService {
             'source'      => 'Adzuna',
         ])->toArray();
     }
+
 }
