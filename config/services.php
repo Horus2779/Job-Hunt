@@ -40,4 +40,8 @@ return [
         'key' => env('ADZUNA_APP_KEY'),
     ],
 
+    'jooble' => [
+        'key' => env('JOOBLE_APP_KEY'),
+    ],
+
 ];

@@ -5,7 +5,8 @@ namespace App\Services;
 class JobsService
 {
     public function __construct(
-       protected AdzumaService $adzuma
+       protected AdzumaService $adzuma,
+       protected JoobleService $jooble
     )
     {}
 
@@ -14,8 +15,8 @@ class JobsService
 
         $jobs = [
             'adzuna' => $this->adzuma->getJobs('br'),
+            'jooble' => $this->jooble->getJobs('br'),
         ];
-
 
         return $jobs;
     }
