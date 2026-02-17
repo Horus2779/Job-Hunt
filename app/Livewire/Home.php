@@ -6,23 +6,29 @@ use App\Services\JobsService;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
+use App\Models\AppliedJobs;
+use App\Models\ApiSources;
 
 class Home extends Component
 {
     use WithPagination;
 
     protected $paginationTheme = 'bootstrap';
-
     private $perPage = 10;
+    public $country = 'br';
 
     public function render(JobsService $service)
     {
-        $allJobs = $service->getJobs(); 
+        $allJobs = $service->getJobs($this->country); 
         
         $paginatedJobs = $this->paginateJobs($allJobs);
 
         return view('livewire.home', $paginatedJobs);
+    }
+
+    public function updateCountry()
+    {
+        $this->resetPage();
     }
 
     private function paginateJobs($jobs)
@@ -44,5 +50,23 @@ class Home extends Component
         }
 
         return $paginatedJobs;
+    }
+
+    public function applyToJob(array $jobData)
+    {
+        $source = ApiSources::where('name', $jobData['source'])->first();
+
+        AppliedJobs::updateOrCreate(
+            ['url' => $jobData['url']] ,
+            [
+                'title' => $jobData['title'],
+                'company' => $jobData['company'],
+                'location' => $jobData['location'],
+                'source_id' => $source->id ?? 1,
+                'status' => 1,
+            ]
+        );
+
+        session()->flash('message', 'Interesse registrado com sucesso!');
     }
 }

@@ -42,18 +42,16 @@ class AdzumaService {
 
         $countries = ['br', 'ca', 'gb'];
 
-        foreach($countries as $country) {
-            $response = Http::get("https://api.adzuna.com/v1/api/jobs/{$country}/search/1", [
-                'app_id' => $this->appId,
-                'app_key' => $this->appKey,
-                'results_per_page' => 50,
-                'what' => $query,
-                'content-type' => 'application/json'
-            ]);
+        $response = Http::get("https://api.adzuna.com/v1/api/jobs/{$country}/search/1", [
+            'app_id' => $this->appId,
+            'app_key' => $this->appKey,
+            'results_per_page' => 50,
+            'what' => $query,
+            'content-type' => 'application/json'
+        ]);
 
-            if($response->successful()) {
-                return $this->formatResults($response->json()['results'] ?? []);
-            }
+        if($response->successful()) {
+            return $this->formatResults($response->json()['results'] ?? []);
         }
 
         return [];

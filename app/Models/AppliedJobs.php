@@ -10,4 +10,13 @@ class AppliedJobs extends Model
     use HasFactory;
 
     protected $table = 'applied_jobs';
+
+    protected $fillable = [
+        'title',
+        'company',
+        'location',
+        'url',
+        'source_id',
+        'status'
+    ];
 }

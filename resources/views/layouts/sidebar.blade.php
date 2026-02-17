@@ -16,27 +16,6 @@
                 <hr>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="nav-icon bi bi-box-seam-fill"></i><p>
-                            Curriculo
-                        <i class="nav-arrow bi bi-chevron-right"></i></p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon bi bi-circle"></i>
-                                <p>Adicionar</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon bi bi-circle"></i>
-                                <p>Editar</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
                         <i class="nav-icon bi bi-table"></i><p>
                             Sites
                         <i class="nav-arrow bi bi-chevron-right"></i></p>
@@ -46,6 +25,14 @@
                             <a href="{{ route('adzuna') }}" class="nav-link">
                                 <i class="nav-icon bi bi-circle"></i>
                                 <p>Adzuna</p>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('adzuna') }}" class="nav-link">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Jooble</p>
                             </a>
                         </li>
                     </ul>

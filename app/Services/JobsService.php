@@ -10,12 +10,12 @@ class JobsService
     )
     {}
 
-    public function getJobs()
+    public function getJobs($country)
     {
 
         $jobs = [
-            'adzuna' => $this->adzuma->getJobs('br'),
-            'jooble' => $this->jooble->getJobs('br'),
+            'adzuna' => $this->adzuma->getJobs($country),
+            'jooble' => $this->jooble->getJobs($country),
         ];
 
         return $jobs;

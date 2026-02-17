@@ -19,7 +19,6 @@ class JoobleService
     {
         $cache_key = "jobs_jooble_$country";
 
-        // Ajustado para 10800 (3 horas)
         return Cache::remember($cache_key, 10800, function () use ($country) {
             return $this->fetchFromApi($country);
         });
@@ -58,7 +57,6 @@ class JoobleService
             'company'     => $job['company'] ?? 'N/A',
             'location'    => $job['location'] ?? 'Remote',
             'url'         => $job['link'],
-            // O snippet do Jooble pode vir com muito lixo HTML, o strip_tags é essencial aqui
             'description' => str(strip_tags($job['snippet'] ?? ''))->limit(250),
             'source'      => 'Jooble',
         ])->toArray();

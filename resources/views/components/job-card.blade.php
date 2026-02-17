@@ -11,9 +11,14 @@
             </div>
 
             <div class="col-auto d-flex gap-2">
-                <a href="{{ $job['url'] }}" target="_blank" class="btn btn-secondary btn-sm px-3">
+
+                <button
+                    wire:click="applyToJob({{ json_encode($job) }})"
+                    @click="window.open('{{ $job['url'] }}', '_blank')"
+                    class="btn btn-secondary btn-sm px-3"
+                >
                     Candidatar
-                </a>
+                </button>
                 
                 <button @click="open = !open" type="button" class="btn btn-outline-secondary btn-sm">
                     <span x-text="open ? 'Recolher' : 'Ver detalhes'"></span>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\AppliedJobs;
 
 class OpenJobsController extends Controller
 {
@@ -13,7 +14,9 @@ class OpenJobsController extends Controller
 
     public function appliedJobs()
     {
-        return view('applied_jobs');
+        $jobs = AppliedJobs::where('status', 1)->get();
+
+        return view('applied_jobs', compact('jobs'));
     }
 
     public function closedJobs()
