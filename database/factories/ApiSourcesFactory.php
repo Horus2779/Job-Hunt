@@ -15,9 +15,13 @@ class ApiSourcesFactory extends Factory
      * @return array<string, mixed>
      */
     public function definition(): array
-    {
-        return [
-            'name' => $this->faker->randomElement(['LinkedIn', 'Indeed', 'Adzuna', 'Glassdoor'])
-        ];
-    }
+{
+    static $names = ['LinkedIn', 'Indeed', 'Adzuna', 'Glassdoor'];
+    
+    $name = array_shift($names);
+
+    return [
+        'name' => $name ?? $this->faker->word(),
+    ];
+}
 }

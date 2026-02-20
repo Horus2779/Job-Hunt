@@ -16,8 +16,13 @@ class AppliedStatusFactory extends Factory
      */
     public function definition(): array
     {
+
+        static $status = ['Applied', 'Refused', 'Aceppted'];
+
+        $statu = array_shift($status);
+
         return [
-            'status' => $this->faker->randomElement(['Applied', 'Refused', 'Aceppted'])
+            'status' => $this->faker->word()
         ];
     }
 }

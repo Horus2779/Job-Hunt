@@ -6,7 +6,8 @@ class JobsService
 {
     public function __construct(
        protected AdzumaService $adzuma,
-       protected JoobleService $jooble
+       protected JoobleService $jooble,
+       protected JSearchService $jsearch
     )
     {}
 
@@ -16,6 +17,7 @@ class JobsService
         $jobs = [
             'adzuna' => $this->adzuma->getJobs($country),
             'jooble' => $this->jooble->getJobs($country),
+            'jsearch' => $this->jsearch->getJobs($country)
         ];
 
         return $jobs;
