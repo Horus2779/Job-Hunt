@@ -57,6 +57,26 @@
 
             </div>
         </div>
+
+        <div class="col-lg-6 col-sm-12">
+            <div class="container mt-4 bg-secondary-subtle rounded panel">
+                <div class="p-2 m-1">
+                    <img src="https://imgs.search.brave.com/0p5t7St0_NMJOu2BNjem4BFCWNnwBH9XZCnxVskQpMs/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/b3BlbndlYm5pbmph/LmNvbS9fbmV4dC9p/bWFnZT91cmw9L2pz/ZWFyY2hfYXBpLnBu/ZyZ3PTEyOCZxPTc1" alt="jsearch" class="img-fluid img-logo">
+                </div>
+                @foreach ($jsearch as $job)
+                    <x-job-card :job="$job" />
+                @endforeach
+
+                @if(empty($jsearch))
+                    <div class="alert alert-info">Nenhuma vaga encontrada.</div>
+                @endif
+
+                <div class="mt-4 d-flex justify-content-center">
+                    {{ $jsearch->links(data: ['pageName' => 'jsearch']) }}
+                </div>
+
+            </div>
+        </div>
     </div>
 
     <style>

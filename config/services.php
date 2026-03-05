@@ -44,7 +44,7 @@ return [
         'key' => env('JOOBLE_APP_KEY'),
     ],
 
-    'jserch' => [
+    'jsearch' => [
         'key' => env('JSEARCH_APP_KEY')
     ]
 
