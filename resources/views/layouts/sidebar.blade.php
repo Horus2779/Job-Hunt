@@ -17,29 +17,6 @@
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon bi bi-table"></i><p>
-                            Sites
-                        <i class="nav-arrow bi bi-chevron-right"></i></p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{ route('adzuna') }}" class="nav-link">
-                                <i class="nav-icon bi bi-circle"></i>
-                                <p>Adzuna</p>
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{ route('adzuna') }}" class="nav-link">
-                                <i class="nav-icon bi bi-circle"></i>
-                                <p>Jooble</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon bi bi-table"></i><p>
                             Vagas
                         <i class="nav-arrow bi bi-chevron-right"></i></p>
                     </a>
@@ -59,26 +36,11 @@
                             </a>
                         </li>
                     </ul>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{ route('closedJobs') }}" class="nav-link">
-                                <i class="nav-icon bi bi-circle"></i>
-                                <p>Concluidas</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-header">Config</li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon bi bi-download"></i>
-                        <p>APIs</p>
-                    </a>
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon bi bi-download"></i>
-                        <p>Schedule</p>
+                        <p>Logs</p>
                     </a>
                 </li>
             </ul>

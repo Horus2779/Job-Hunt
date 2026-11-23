@@ -1,59 +1,173 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Job Hunter
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Agregador pessoal de vagas de emprego. Busca vagas em várias APIs (Adzuna, Jooble e JSearch) a partir de palavras-chave que você define, mostra tudo em um painel único e permite registrar as vagas em que você se candidatou.
 
-## About Laravel
+Construído com **Laravel 12**, **Livewire 4** e o template **AdminLTE 4** (Bootstrap 5).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<!-- Adicione aqui um print da tela principal: ![Tela principal](docs/screenshot.png) -->
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Funcionalidades
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Busca multi-fonte**: consulta Adzuna e Jooble em paralelo na mesma tela (JSearch em integração, veja o [Roadmap](#roadmap)).
+- **Parâmetros de busca configuráveis**: cadastre palavras-chave (ex.: `Laravel`, `PHP`, `Developer`) com operador lógico `E` / `OU`, direto pela interface.
+- **Filtro por país**: Brasil, Canadá, Grã-Bretanha e Irlanda.
+- **Paginação por fonte**: 10 vagas por página, independente em cada painel.
+- **Cache de 3 horas** nas respostas das APIs, para economizar a cota dos serviços.
+- **Candidatura em um clique**: o botão *Candidatar* abre a vaga no site de origem e a registra no banco local.
+- **Lista de vagas inscritas** com título, empresa, localização e link.
 
-## Learning Laravel
+## Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+| Camada | Tecnologia |
+| --- | --- |
+| Backend | PHP 8.2+, Laravel 12 |
+| Interface reativa | Livewire 4 (+ Alpine.js embutido) |
+| Template | AdminLTE 4 / Bootstrap 5 (arquivos em `public/adminlte`, demais assets via CDN jsDelivr) |
+| Banco de dados | SQLite por padrão (qualquer banco suportado pelo Laravel funciona) |
+| Cache / sessões | Driver `database` |
+| Fontes de vagas | [Adzuna](https://developer.adzuna.com), [Jooble](https://jooble.org/api/about), [JSearch (OpenWeb Ninja)](https://www.openwebninja.com) |
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Pré-requisitos
 
-## Laravel Sponsors
+- PHP **8.2 ou superior** com as extensões `pdo_sqlite` (ou a do seu banco), `mbstring`, `openssl`, `curl`, `xml`, `ctype` e `fileinfo`
+- [Composer](https://getcomposer.org) 2
+- Chaves de API das fontes que você quiser usar (veja abaixo)
+- Conexão com a internet no navegador: o layout carrega CSS/JS do jsDelivr
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+> Node.js **não é necessário** para rodar a aplicação: as views usam o AdminLTE pronto e não carregam o bundle do Vite.
 
-### Premium Partners
+## Instalação
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+# 1. Clonar
+git clone https://github.com/Horus2779/Job-Hunt.git
+cd Job-Hunt
 
-## Contributing
+# 2. Dependências PHP
+composer install
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# 3. Variáveis de ambiente
+cp .env.example .env
+php artisan key:generate
 
-## Code of Conduct
+# 4. Banco SQLite
+touch database/database.sqlite      # Windows (PowerShell): New-Item database/database.sqlite
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# 5. Tabelas
+php artisan migrate
 
-## Security Vulnerabilities
+# 6. (Opcional) dados de exemplo
+php artisan db:seed
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 7. Subir o servidor
+php artisan serve
+```
 
-## License
+Acesse **http://localhost:8000**.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Configuração
+
+Edite o `.env` e preencha as chaves das APIs:
+
+```env
+ADZUNA_APP_ID=
+ADZUNA_APP_KEY=
+JOOBLE_APP_KEY=
+JSEARCH_APP_KEY=
+```
+
+| Variável | Onde obter |
+| --- | --- |
+| `ADZUNA_APP_ID`, `ADZUNA_APP_KEY` | Cadastro gratuito em <https://developer.adzuna.com> |
+| `JOOBLE_APP_KEY` | Solicitação de chave em <https://jooble.org/api/about> |
+| `JSEARCH_APP_KEY` | Conta em <https://www.openwebninja.com> |
+
+Outros pontos do `.env`:
+
+- `DB_CONNECTION=sqlite` é o padrão. Para MySQL/PostgreSQL, ajuste `DB_*` e rode `php artisan migrate`.
+- `CACHE_STORE=database` e `SESSION_DRIVER=database` usam as tabelas criadas pelas migrations.
+- `QUEUE_CONNECTION`: o projeto ainda não usa filas. Use `sync` se for rodar `composer run dev` (veja [Problemas comuns](#problemas-comuns)).
+
+## Como usar
+
+1. Abra **Vagas → Parâmetros** e cadastre as palavras-chave da sua busca, escolhendo `E` ou `OU` para cada uma.
+2. Volte à **Home**, escolha o país e navegue pelas vagas de cada fonte.
+3. Clique em **Ver detalhes** para ler a descrição, ou em **Candidatar** para abrir a vaga e registrá-la.
+4. Acompanhe o que já enviou em **Vagas → Inscritas**.
+
+Sem nenhum parâmetro cadastrado, nenhuma busca é feita e os painéis aparecem vazios.
+
+## Arquitetura
+
+```
+app/
+├── Http/Controllers/     # HomeController, OpenJobsController (páginas Blade)
+├── Livewire/
+│   ├── Home.php          # listagem, paginação por fonte e ação "Candidatar"
+│   └── JobParameter.php  # CRUD dos parâmetros de busca
+├── Models/               # ParameterJobs, AppliedJobs, ApiSources, AppliedStatus, LocationJobs
+└── Services/
+    ├── JobsService.php   # agrega as fontes
+    ├── AdzumaService.php # Adzuna
+    ├── JoobleService.php # Jooble
+    └── JSearchService.php# JSearch (em andamento)
+resources/views/
+├── layouts/              # AdminLTE: admin, topbar, sidebar, css, scripts
+├── livewire/             # home, job-parameter
+└── components/job-card.blade.php
+```
+
+**Fluxo de uma busca:** `Home` (Livewire) → `JobsService::getJobs($country)` → cada `*Service` monta a query a partir de `parameter_jobs`, chama a API, normaliza o resultado para `title / company / location / url / description / source` e guarda em cache por 3 horas (`jobs_{fonte}_{país}`).
+
+Para forçar uma nova busca antes do cache expirar:
+
+```bash
+php artisan cache:clear
+```
+
+### Banco de dados
+
+| Tabela | Função |
+| --- | --- |
+| `parameter_jobs` | palavras-chave de busca e operador lógico (`AND` / `OR`) |
+| `applied_jobs` | vagas registradas (título, empresa, local, URL, fonte, status) |
+| `api_sources` | fontes de vagas |
+| `applied_status` | status possíveis de uma candidatura |
+| `location_jobs` | países de busca |
+| `cache`, `cache_locks`, `sessions` | infraestrutura do Laravel |
+
+## Problemas comuns
+
+| Sintoma | Causa provável | Solução |
+| --- | --- | --- |
+| `TypeError` ao abrir a Home, citando `appId`, `appKey` ou `api_key` | Chaves de API ausentes no `.env` | Preencha as variáveis da seção [Configuração](#configuração) e rode `php artisan config:clear` |
+| `unable to open database file` | Arquivo SQLite não existe | `touch database/database.sqlite` e rode `php artisan migrate` |
+| Painéis sempre vazios | Nenhum parâmetro cadastrado, chave inválida ou país não suportado pela fonte | Cadastre parâmetros, confira as chaves e rode `php artisan cache:clear` |
+| Tela sem estilo / sem menu | Sem acesso ao jsDelivr | Verifique a conexão ou hospede os assets localmente |
+| `composer run dev` encerra logo após iniciar | `queue:listen` não encontra a tabela `jobs` e `--kill-others` derruba os demais processos | Use `QUEUE_CONNECTION=sync` e rode `php artisan serve` separadamente |
+| `php artisan pail` falha no Windows | O Pail depende da extensão `pcntl` | Use `php artisan serve` diretamente |
+
+## Testes
+
+```bash
+composer test
+```
+
+## Roadmap
+
+- [ ] Finalizar a integração com o JSearch (normalização do retorno e painel na Home)
+- [ ] Tela de **Vagas Concluídas** e gestão de status das candidaturas
+- [ ] Páginas por fonte (menu **Sites**) e tela de configuração das APIs
+- [ ] Autenticação (hoje o painel é de usuário único e sem login)
+- [ ] Filtros adicionais (modalidade remota, faixa salarial, data de publicação)
+- [ ] Testes automatizados para os services (com `Http::fake()`)
+
+## Créditos
+
+- [Laravel](https://laravel.com) e [Livewire](https://livewire.laravel.com)
+- Template [AdminLTE](https://adminlte.io) (licença MIT)
+- Dados de vagas fornecidos por Adzuna, Jooble e JSearch/OpenWeb Ninja, sujeitos aos respectivos termos de uso
+
+## Autor
+
+**Lucivaldo Junior** — [GitHub](https://github.com/Horus2779) · [LinkedIn](https://www.linkedin.com/in/lucivaldo-junior11)
