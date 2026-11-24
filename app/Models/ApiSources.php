@@ -10,6 +10,7 @@ class ApiSources extends Model
     use HasFactory;
 
     protected $table = 'api_sources';
+    protected $fillable = ['name'];
     
     public $timestamps = false;
 }

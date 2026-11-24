@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ParameterJobs;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -15,12 +16,17 @@ class AdzumaService
 
     public function __construct()
     {
-        $this->appId  = config('services.adzuma.id');
-        $this->appKey = config('services.adzuma.key');
+        $this->appId  = (string) config('services.adzuma.id');
+        $this->appKey = (string) config('services.adzuma.key');
     }
 
     public function getJobs(string $country): array
     {
+        if ($this->appId === '' || $this->appKey === '') {
+            Log::warning('Adzuna: chave de API não configurada no .env');
+            return [];
+        }
+
         $cacheKey = "jobs_adzuna_$country";
 
         $cached = Cache::get($cacheKey);
@@ -29,9 +35,16 @@ class AdzumaService
             return $cached;
         }
 
-        $jobs = $this->fetchFromApi($country);
+        $parameters = ParameterJobs::all();
+
+        if ($parameters->isEmpty()) {
+            return [];
+        }
+
+        $jobs = $this->fetchFromApi($country, $parameters);
 
         if ($jobs === null) {
+            Cache::put($cacheKey, [], 300);
             return [];
         }
 
@@ -40,21 +53,10 @@ class AdzumaService
         return $jobs;
     }
 
-    private function fetchFromApi(string $country): ?array
+    private function fetchFromApi(string $country, Collection $parameters): ?array
     {
-        $parameters = ParameterJobs::get();
-
-        if ($parameters->isEmpty()) {
-            return null;
-        }
-
-        $query = $parameters->map(function ($item, $key) use ($parameters) {
-            if ($key === $parameters->count() - 1) {
-                return $item->parameter;
-            }
-
-            return "$item->parameter $item->logic_operator";
-        })->implode(' ');
+        $whatAnd = $parameters->where('logic_operator', 'AND')->pluck('parameter')->implode(' ');
+        $whatOr  = $parameters->where('logic_operator', '!=', 'AND')->pluck('parameter')->implode(' ');
 
         try {
             $response = Http::acceptJson()
@@ -67,8 +69,10 @@ class AdzumaService
                     'app_id'           => $this->appId,
                     'app_key'          => $this->appKey,
                     'results_per_page' => 50,
-                    'what'             => $query,
-                ]);
+                ] + array_filter([
+                    'what_and' => $whatAnd,
+                    'what_or'  => $whatOr,
+                ]));
         } catch (ConnectionException $e) {
             Log::warning('Adzuna: falha de conexão', ['country' => $country, 'error' => $e->getMessage()]);
             return null;

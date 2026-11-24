@@ -10,6 +10,7 @@ class AppliedStatus extends Model
     use HasFactory;
 
     protected $table = 'applied_status';
+    protected $fillable = ['status'];
 
     public $timestamps = false;
 }

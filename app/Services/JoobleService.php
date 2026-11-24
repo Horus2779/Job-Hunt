@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ParameterJobs;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -14,11 +15,16 @@ class JoobleService
 
     public function __construct()
     {
-        $this->api_key = config('services.jooble.key');
+        $this->api_key = (string) config('services.jooble.key');
     }
 
     public function getJobs(string $country): array
     {
+        if ($this->api_key === '') {
+            Log::warning('Jooble: chave de API não configurada no .env');
+            return [];
+        }
+
         $cacheKey = "jobs_jooble_$country";
 
         $cached = Cache::get($cacheKey);
@@ -27,9 +33,16 @@ class JoobleService
             return $cached;
         }
 
-        $jobs = $this->fetchFromApi($country);
+        $parameters = ParameterJobs::all();
+
+        if ($parameters->isEmpty()) {
+            return [];
+        }
+
+        $jobs = $this->fetchFromApi($country, $parameters);
 
         if ($jobs === null) {
+            Cache::put($cacheKey, [], 300);
             return [];
         }
 
@@ -38,14 +51,8 @@ class JoobleService
         return $jobs;
     }
 
-    private function fetchFromApi(string $country): ?array
+    private function fetchFromApi(string $country, Collection $parameters): ?array
     {
-        $parameters = ParameterJobs::all();
-
-        if ($parameters->isEmpty()) {
-            return null;
-        }
-
         $keywords = $parameters->pluck('parameter')->implode(' ');
         $location = $this->mapCountryName($country);
 

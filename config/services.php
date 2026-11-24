@@ -45,7 +45,8 @@ return [
     ],
 
     'jsearch' => [
-        'key' => env('JSEARCH_APP_KEY')
+        'key' => env('JSEARCH_APP_KEY'),
+        'pages' => (int) env('JSEARCH_PAGES', 2),
     ]
 
 ];

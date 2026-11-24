@@ -10,6 +10,7 @@ class LocationJobs extends Model
     use HasFactory;
 
     protected $table = 'location_jobs';
+    protected $fillable = ['country'];
 
     public $timestamps = false;
 }

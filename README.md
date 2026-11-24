@@ -8,8 +8,8 @@ Construído com **Laravel 12**, **Livewire 4** e o template **AdminLTE 4** (Boot
 
 ## Funcionalidades
 
-- **Busca multi-fonte**: consulta Adzuna e Jooble em paralelo na mesma tela (JSearch em integração, veja o [Roadmap](#roadmap)).
-- **Parâmetros de busca configuráveis**: cadastre palavras-chave (ex.: `Laravel`, `PHP`, `Developer`) com operador lógico `E` / `OU`, direto pela interface.
+- **Busca multi-fonte**: consulta Adzuna, Jooble e JSearch e mostra cada fonte em seu próprio painel na mesma tela.
+- **Parâmetros de busca configuráveis**: cadastre palavras-chave (ex.: `Laravel`, `PHP`, `Developer`) com operador lógico `E` / `OU`, direto pela interface. O operador é aplicado na **Adzuna** (`what_and` / `what_or`); Jooble e JSearch recebem todas as palavras juntas.
 - **Filtro por país**: Brasil, Canadá, Grã-Bretanha e Irlanda.
 - **Paginação por fonte**: 10 vagas por página, independente em cada painel.
 - **Cache de 3 horas** nas respostas das APIs, para economizar a cota dos serviços.
@@ -21,7 +21,7 @@ Construído com **Laravel 12**, **Livewire 4** e o template **AdminLTE 4** (Boot
 | Camada | Tecnologia |
 | --- | --- |
 | Backend | PHP 8.2+, Laravel 12 |
-| Interface reativa | Livewire 4 (+ Alpine.js embutido) |
+| Interface reativa | Livewire 3 (+ Alpine.js embutido) |
 | Template | AdminLTE 4 / Bootstrap 5 (arquivos em `public/adminlte`, demais assets via CDN jsDelivr) |
 | Banco de dados | SQLite por padrão (qualquer banco suportado pelo Laravel funciona) |
 | Cache / sessões | Driver `database` |
@@ -29,7 +29,7 @@ Construído com **Laravel 12**, **Livewire 4** e o template **AdminLTE 4** (Boot
 
 ## Pré-requisitos
 
-- PHP **8.2 ou superior** com as extensões `pdo_sqlite` (ou a do seu banco), `mbstring`, `openssl`, `curl`, `xml`, `ctype` e `fileinfo`
+- PHP **8.5.2 ou superior** com as extensões `pdo_sqlite` (ou a do seu banco), `mbstring`, `openssl`, `curl`, `xml`, `ctype` e `fileinfo`
 - [Composer](https://getcomposer.org) 2
 - Chaves de API das fontes que você quiser usar (veja abaixo)
 - Conexão com a internet no navegador: o layout carrega CSS/JS do jsDelivr
@@ -56,8 +56,10 @@ touch database/database.sqlite      # Windows (PowerShell): New-Item database/da
 # 5. Tabelas
 php artisan migrate
 
-# 6. (Opcional) dados de exemplo
+# 6. Fontes, status e países (recomendado)
 php artisan db:seed
+# (opcional) dados fictícios de demonstração:
+# php artisan db:seed --class=DemoSeeder
 
 # 7. Subir o servidor
 php artisan serve
@@ -74,6 +76,7 @@ ADZUNA_APP_ID=
 ADZUNA_APP_KEY=
 JOOBLE_APP_KEY=
 JSEARCH_APP_KEY=
+JSEARCH_PAGES=2   # páginas (~10 vagas) por busca no JSearch; cada página consome cota
 ```
 
 | Variável | Onde obter |
@@ -86,7 +89,7 @@ Outros pontos do `.env`:
 
 - `DB_CONNECTION=sqlite` é o padrão. Para MySQL/PostgreSQL, ajuste `DB_*` e rode `php artisan migrate`.
 - `CACHE_STORE=database` e `SESSION_DRIVER=database` usam as tabelas criadas pelas migrations.
-- `QUEUE_CONNECTION`: o projeto ainda não usa filas. Use `sync` se for rodar `composer run dev` (veja [Problemas comuns](#problemas-comuns)).
+- `QUEUE_CONNECTION`: o projeto ainda não usa filas, e o `.env.example` já vem com `sync`.
 
 ## Como usar
 
@@ -110,14 +113,14 @@ app/
     ├── JobsService.php   # agrega as fontes
     ├── AdzumaService.php # Adzuna
     ├── JoobleService.php # Jooble
-    └── JSearchService.php# JSearch (em andamento)
+    └── JSearchService.php# JSearch
 resources/views/
 ├── layouts/              # AdminLTE: admin, topbar, sidebar, css, scripts
 ├── livewire/             # home, job-parameter
 └── components/job-card.blade.php
 ```
 
-**Fluxo de uma busca:** `Home` (Livewire) → `JobsService::getJobs($country)` → cada `*Service` monta a query a partir de `parameter_jobs`, chama a API, normaliza o resultado para `title / company / location / url / description / source` e guarda em cache por 3 horas (`jobs_{fonte}_{país}`).
+**Fluxo de uma busca:** `Home` (Livewire) → `JobsService::getJobs($country)` → cada `*Service` monta a query a partir de `parameter_jobs`, chama a API (uma fonte por vez), normaliza o resultado para `title / company / location / url / description / source` e guarda em cache por 3 horas (`jobs_{fonte}_{país}`). Se a API falhar, um resultado vazio é cacheado por 5 minutos para não travar a tela com novas tentativas.
 
 Para forçar uma nova busca antes do cache expirar:
 
@@ -140,11 +143,11 @@ php artisan cache:clear
 
 | Sintoma | Causa provável | Solução |
 | --- | --- | --- |
-| `TypeError` ao abrir a Home, citando `appId`, `appKey` ou `api_key` | Chaves de API ausentes no `.env` | Preencha as variáveis da seção [Configuração](#configuração) e rode `php artisan config:clear` |
+| Painel de uma fonte sempre vazio e aviso `chave de API não configurada` em `storage/logs/laravel.log` | Chave ausente no `.env` | Preencha as variáveis da seção [Configuração](#configuração) e rode `php artisan config:clear` |
 | `unable to open database file` | Arquivo SQLite não existe | `touch database/database.sqlite` e rode `php artisan migrate` |
-| Painéis sempre vazios | Nenhum parâmetro cadastrado, chave inválida ou país não suportado pela fonte | Cadastre parâmetros, confira as chaves e rode `php artisan cache:clear` |
+| Painéis sempre vazios | Nenhum parâmetro cadastrado, chave inválida ou país não suportado pela fonte (ex.: a Adzuna não atende a Irlanda) | Cadastre parâmetros, confira as chaves e o log. Falhas de API ficam em cache por 5 min: rode `php artisan cache:clear` |
 | Tela sem estilo / sem menu | Sem acesso ao jsDelivr | Verifique a conexão ou hospede os assets localmente |
-| `composer run dev` encerra logo após iniciar | `queue:listen` não encontra a tabela `jobs` e `--kill-others` derruba os demais processos | Use `QUEUE_CONNECTION=sync` e rode `php artisan serve` separadamente |
+| `composer run dev` encerra logo após iniciar | `queue:listen` não encontra a tabela `jobs` e `--kill-others` derruba os demais processos | Mantenha `QUEUE_CONNECTION=sync` (padrão do `.env.example`) ou rode `php artisan serve` separadamente |
 | `php artisan pail` falha no Windows | O Pail depende da extensão `pcntl` | Use `php artisan serve` diretamente |
 
 ## Testes
@@ -155,7 +158,6 @@ composer test
 
 ## Roadmap
 
-- [ ] Finalizar a integração com o JSearch (normalização do retorno e painel na Home)
 - [ ] Tela de **Vagas Concluídas** e gestão de status das candidaturas
 - [ ] Páginas por fonte (menu **Sites**) e tela de configuração das APIs
 - [ ] Autenticação (hoje o painel é de usuário único e sem login)

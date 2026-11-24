@@ -26,7 +26,7 @@
                     <x-job-card :job="$job" />
                 @endforeach
 
-                @if(empty($adzuna))
+                @if($adzuna->total() === 0)
                     <div class="alert alert-info">Nenhuma vaga encontrada.</div>
                 @endif
 
@@ -47,7 +47,7 @@
                     <x-job-card :job="$job" />
                 @endforeach
 
-                @if(empty($adzuna))
+                @if($jooble->total() === 0)
                     <div class="alert alert-info">Nenhuma vaga encontrada.</div>
                 @endif
 
@@ -67,7 +67,7 @@
                     <x-job-card :job="$job" />
                 @endforeach
 
-                @if(empty($jsearch))
+                @if($jsearch->total() === 0)
                     <div class="alert alert-info">Nenhuma vaga encontrada.</div>
                 @endif
 

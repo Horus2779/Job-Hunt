@@ -54,7 +54,7 @@ class Home extends Component
 
     public function applyToJob(array $jobData)
     {
-        $source = ApiSources::where('name', $jobData['source'])->first();
+        $source = ApiSources::firstOrCreate(['name' => $jobData['source']]);
 
         AppliedJobs::updateOrCreate(
             ['url' => $jobData['url']] ,
@@ -62,7 +62,7 @@ class Home extends Component
                 'title' => $jobData['title'],
                 'company' => $jobData['company'],
                 'location' => $jobData['location'],
-                'source_id' => $source->id ?? 1,
+                'source_id' => $source->id,
                 'status' => 1,
             ]
         );
