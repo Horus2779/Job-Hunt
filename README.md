@@ -21,7 +21,7 @@ Construído com **Laravel 12**, **Livewire 4** e o template **AdminLTE 4** (Boot
 | Camada | Tecnologia |
 | --- | --- |
 | Backend | PHP 8.2+, Laravel 12 |
-| Interface reativa | Livewire 3 (+ Alpine.js embutido) |
+| Interface reativa | Livewire 4 (+ Alpine.js embutido) |
 | Template | AdminLTE 4 / Bootstrap 5 (arquivos em `public/adminlte`, demais assets via CDN jsDelivr) |
 | Banco de dados | SQLite por padrão (qualquer banco suportado pelo Laravel funciona) |
 | Cache / sessões | Driver `database` |
